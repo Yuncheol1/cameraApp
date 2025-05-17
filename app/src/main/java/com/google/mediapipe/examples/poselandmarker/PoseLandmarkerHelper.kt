@@ -41,6 +41,7 @@ class PoseLandmarkerHelper(
     var currentDelegate: Int = DELEGATE_CPU,
     var runningMode: RunningMode = RunningMode.IMAGE,
     val context: Context,
+    private val deviceId: String = "Device1",
     // this listener is only used when running in RunningMode.LIVE_STREAM
     val poseLandmarkerHelperListener: LandmarkerListener? = null
 ) {
@@ -348,7 +349,7 @@ class PoseLandmarkerHelper(
             // ✅ 관절 데이터 추출
             val landmarks = result.landmarks().firstOrNull()
             if (landmarks == null) {
-                Log.e("PoseDebug", "❗ landmarks가 null. 아무것도 전송 안 함.")
+                Log.e("PoseDebug", " landmarks가 null. 아무것도 전송 안 함.")
                 return
             }
 
@@ -365,18 +366,19 @@ class PoseLandmarkerHelper(
 
             val finalJson = """
             {
+                "deviceId": "$deviceId",
                 "landmarks": [${jsonList.joinToString(",")}]
             }
         """.trimIndent()
 
-            Log.d("PoseDebug", "📦 전송할 JSON: $finalJson")
+            Log.d("PoseDebug", " 전송할 JSON: $finalJson")
 
             // ✅ 전송 시도
             if (webSocketManager == null) {
-                Log.e("WebSocket", "❌ webSocketManager가 null!")
+                Log.e("WebSocket", " webSocketManager가 null!")
             } else {
                 webSocketManager.sendMessage(finalJson)
-                Log.d("PoseDebug", "📤 sendMessage() 호출됨")
+                Log.d("PoseDebug", " sendMessage() 호출됨")
             }
 
             // 기존 로그
